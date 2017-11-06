@@ -1,0 +1,6 @@
+[package]
+name = "progress_string"
+version = "0.1.0"
+authors = ["rfm"]
+
+[dependencies]
