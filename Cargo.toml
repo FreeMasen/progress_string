@@ -4,5 +4,6 @@ version = "0.1.1"
 authors = ["FreeMasen"]
 description = "Generate a progress bar string"
 repository = "https://github.com/freemasen/progress_string"
+license = "MIT"
 
 [dependencies]
