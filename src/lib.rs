@@ -31,6 +31,7 @@ pub struct Bar {
     empty_char: char,
     full_char: char,
     include_percent: bool,
+    include_numbers: bool,
     previous_text_width: usize,
 }
 
@@ -133,6 +134,22 @@ impl BarBuilder {
         self.bar.include_percent = true;
         self
     }
+    /// Update the bar to include the divison after
+    /// the bar representation
+    ///
+    /// #### Examples
+    /// ```
+    /// let mut no_n = BarBuilder::new().get_bar();
+    /// no_n.replace(50);
+    /// //yeilds [██████████          ]
+    /// let mut with_n = BarBuilder::new().include_numbers().get_bar();
+    /// with_n.replace(50)
+    /// //yeilds [██████████          ] 50/100
+    /// ```
+    pub fn include_numbers(mut self) -> BarBuilder {
+        self.bar.include_numbers = true;
+        self
+    }
     /// Complete building your bar and return the
     /// updated struct
     /// 
@@ -148,6 +165,18 @@ impl BarBuilder {
 
 impl Bar {
     ///Bar constructor with default values
+    /// ```
+    /// Bar {
+    ///      current_partial: 0,
+    ///     total: 100,
+    ///     width: 50,
+    ///     full_char:  '█',
+    ///     empty_char: ' ',
+    ///     include_percent: false,
+    ///     include_numbers: false,
+    ///     previous_text_width: 0
+    /// }
+    /// ```
     pub fn default() -> Bar {
         Bar {
             current_partial: 0,
@@ -156,6 +185,7 @@ impl Bar {
             full_char:  '█',
             empty_char: ' ',
             include_percent: false,
+            include_numbers: false,
             previous_text_width: 0
         }
     }
@@ -223,6 +253,10 @@ impl Bar {
         if self.include_percent {
             progress_bar.push_str(format!(" {:.2}%", percent * 100.0).as_str());
         }
+        if self.include_numbers {
+            progress_bar.push_str(format!(" {:?}/{:?}",
+                                self.current_partial, self.total).as_str());
+        }
         progress_bar
     }
 }
@@ -247,19 +281,23 @@ impl Bar {
     /// //prints 60
     /// ```
     pub fn get_width(&self) -> usize {
-        match self.include_percent {
-            true => {
+        let mut width: usize = 52;
+        if self.include_numbers {
+            let total_string = format!("{}", self.total);
+            let partial_string = format!("{}", self.current_partial);
+            width += total_string.len() + partial_string.len() + 2;
+        }
+        if self.include_percent {
                 let current_percent = self.calculate_percent();
                 if current_percent >= 0.95 {
-                    self.width + 10
+                    width += 8;
                 } else if current_percent > 0.095 {
-                    self.width + 9
+                    width += 7;
                 } else {
-                    self.width + 8
+                    width += 6;
                 }
-            }
-            _ => self.width + 2
         }
+        width
     }
     /// Similar to `get_width` but gets the value
     /// before the last `update` or `replace` call
@@ -279,23 +317,49 @@ impl Bar {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
-    fn builder_test() {
-        assert_eq!(2 + 2, 4);
+    fn include_percent_test() {
+        let mut bar = BarBuilder::new()
+                        .include_percent()
+                        .get_bar();
+        assert_eq!(bar.get_width(), 58);
+        bar.update(50);
+        assert_eq!(bar.get_width(), 59);
+        bar.update(50);
+        assert_eq!(bar.get_width(), 60);
+    }
+
+    #[test]
+    fn include_numbers_test() {
+        let mut bar = BarBuilder::new()
+                    .include_numbers()
+                    .get_bar();
+        assert_eq!(bar.get_width(), 58);
+        bar.update(50);
+        assert_eq!(bar.get_width(), 59);
+        bar.update(50);
+        assert_eq!(bar.get_width(), 60);
     }
 
     #[test]
     fn update_test() {
+        let mut bar = Bar::default();
+        bar.update(50);
 
     }
 
     #[test]
     fn replace_test() {
-
+        let mut bar = Bar::default();
+        bar.replace(10);
     }
 
     #[test]
     fn to_string_test() {
-        
+        let mut bar = Bar::default();
+        assert_eq!(bar.to_string(), "[                                                  ]");
+        bar.update(50);
+        assert_eq!(bar.to_string(), "[█████████████████████████                         ]")
     }
 }
