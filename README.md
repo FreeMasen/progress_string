@@ -1,7 +1,14 @@
 # progress_string
 
 This library is primarily concerned with generating strings that can be used by
-your favorite terminal stream manipulation system to display a progress bar.
+your favorite terminal stream manipulation system to display a progress bar
+like this:
+
+```
+[██████████████████                                ] 35.70%
+```
+
+[Documentation](https://docs.rs/crate/progress_string)
 
 ## Examples
 
