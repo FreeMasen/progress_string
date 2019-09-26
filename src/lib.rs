@@ -4,7 +4,7 @@
 //!
 //! #### Example
 //!
-//! ```
+//! ```no_run
 //! extern crate progress_string;
 //! extern crate termion;
 //!
@@ -61,6 +61,8 @@ impl Bar {
 ///
 /// #### Examples
 /// ```
+/// use progress_string::BarBuilder;
+///
 /// let bar = BarBuilder::new()
 ///                     .total(1000000)
 ///                     .width(20)
@@ -82,12 +84,13 @@ impl BarBuilder {
             bar: Bar::default(),
         }
     }
-    /// Add update the total (default 100)
-    /// let thousand = BarBuilder::new().total(1000).get_bar();
+    /// Update the total (default 100)
     ///
     /// #### Examples
     /// ```
-    /// thousand.update(200);
+    /// use progress_string::BarBuilder;
+    ///
+    /// let thousand = BarBuilder::new().total(1000).get_bar();
     /// // yields [█                                                 ]
     /// ```
     pub fn total(mut self, total: usize) -> BarBuilder {
@@ -96,6 +99,8 @@ impl BarBuilder {
     }
     /// Update the progress section's width (default 50)
     /// ```
+    /// use progress_string::BarBuilder;
+    ///
     /// let bar = BarBuilder::new().width(10);
     /// // yields [          ]
     /// ```
@@ -108,8 +113,10 @@ impl BarBuilder {
     ///
     /// #### Examples
     /// ```
+    /// use progress_string::BarBuilder;
+    ///
     /// let zero_emp = BarBuilder::new().empty_char('0').get_bar();
-    /// yields
+    /// // yields
     /// // [██████████00000000000]
     /// ```
     pub fn empty_char(mut self, character: char) -> BarBuilder {
@@ -121,6 +128,8 @@ impl BarBuilder {
     ///
     /// #### Examples
     /// ```
+    /// use progress_string::BarBuilder;
+    ///
     /// let x_bar = BarBuilder::new().full_char('X').get_bar();
     /// // yields [XXXXXX      ]
     /// let y_bar = BarBuilder::new().full_char('Y').get_bar();
@@ -136,9 +145,11 @@ impl BarBuilder {
     ///
     /// #### Examples
     /// ```
+    /// use progress_string::BarBuilder;
+    ///
     /// let no_p = BarBuilder::new().include_percent().get_bar();
     /// // yields [██████████          ] 50.00%
-    /// let with_p = BarBuilder::new()
+    /// let with_p = BarBuilder::new();
     /// // yields [██████████          ]
     /// ```
     pub fn include_percent(mut self) -> BarBuilder {
@@ -150,6 +161,8 @@ impl BarBuilder {
     ///
     /// #### Examples
     /// ```
+    /// use progress_string::BarBuilder;
+    ///
     /// let mut no_n = BarBuilder::new().get_bar();
     /// no_n.replace(50);
     /// // yields [██████████          ]
@@ -166,6 +179,8 @@ impl BarBuilder {
     ///
     /// #### Examples
     /// ```
+    /// use progress_string::BarBuilder;
+    ///
     /// let bar = BarBuilder::new().get_bar();
     /// // yields a default bar instance
     /// ```
@@ -176,9 +191,9 @@ impl BarBuilder {
 
 impl Bar {
     ///Bar constructor with default values
-    /// ```
+    /// ```text
     /// Bar {
-    ///      current_partial: 0,
+    ///     current_partial: 0,
     ///     total: 100,
     ///     width: 50,
     ///     full_char:  '█',
@@ -208,9 +223,11 @@ impl Bar {
     ///
     /// #### Examples
     /// ```
+    /// use progress_string::Bar;
+    ///
     /// let mut bar = Bar::default();
     /// bar.update(10);
-    /// assert_eq!(bar.current_partial, 110);
+    /// assert_eq!(bar.current_partial, 10);
     /// ```
     pub fn update(&mut self, to_add: usize) {
         self.previous_text_width = self.get_width();
@@ -221,6 +238,8 @@ impl Bar {
     ///
     /// #### Examples
     /// ```
+    /// use progress_string::Bar;
+    ///
     /// let mut bar = Bar::default();
     /// bar.replace(10);
     /// assert_eq!(bar.current_partial, 10);
@@ -242,8 +261,9 @@ impl Bar {
     ///
     /// #### Examples
     /// ```
-    /// let mut with_percent = BarBuilder::new().include_percent()
-    ///                                             .get_bar();
+    /// use progress_string::BarBuilder;
+    ///
+    /// let mut with_percent = BarBuilder::new().include_percent().get_bar();
     /// with_percent.update(50);
     /// println!("{}", with_percent.to_string());
     /// // prints [█████████████████████████                         ] 50.00%
@@ -279,18 +299,19 @@ impl Bar {
     ///
     /// #### Examples
     /// ```
+    /// use progress_string::{Bar, BarBuilder};
+    ///
     /// let bar = Bar::default();
-    /// println!("{}", bar.get_width());
-    /// //prints 52
-    /// let mut with_percent = BarBuilder;;new().include_precent();
-    /// println!("{}", bar.get_width());
-    /// //prints 58
+    /// assert_eq!(bar.get_width(), 52);
+    ///
+    /// let mut with_percent = BarBuilder::new().include_percent().get_bar();
+    /// assert_eq!(with_percent.get_width(), 58);
+    ///
     /// with_percent.update(10);
-    /// println!("{}", bar.get_width());
-    /// //prints 59
+    /// assert_eq!(with_percent.get_width(), 59);
+    ///
     /// with_percent.replace(100);
-    /// println!("{}", bar.get_width());
-    /// //prints 60
+    /// assert_eq!(with_percent.get_width(), 60);
     /// ```
     pub fn get_width(&self) -> usize {
         let mut width: usize = 52;
