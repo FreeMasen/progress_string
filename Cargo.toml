@@ -7,6 +7,7 @@ repository = "https://github.com/freemasen/progress_string"
 documentation = "https://docs.rs/crate/progress_string"
 readme = "README.md"
 license = "MIT"
+edition = "2018"
 
 [dependencies]
 
