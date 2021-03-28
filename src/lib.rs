@@ -3,15 +3,13 @@
 //!
 //! #### Example
 //!
-//! ```no_run
-//! extern crate progress_string;
-//! extern crate termion;
-//!
+//! ```
 //! use std::thread::sleep;
 //! use std::time::Duration;
 //!
 //! const TOTAL: usize = 1000;
 //!
+//! # #[cfg(unix)]
 //! fn main() {
 //!     let mut bar = progress_string::BarBuilder::new()
 //!         .total(TOTAL)
@@ -30,7 +28,10 @@
 //!     }
 //!     println!("\ndone with progress");
 //! }
-//! ```
+//!
+//! # #[cfg(not(unix))]
+//! fn main() {}
+//!```
 
 /// Represents a progress bar which can be used to get your progress string.
 pub struct Bar {

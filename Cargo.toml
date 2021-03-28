@@ -11,5 +11,5 @@ edition = "2018"
 
 [dependencies]
 
-[dev-dependencies]
+[target.'cfg(unix)'.dev-dependencies]
 termion = "1.0"
