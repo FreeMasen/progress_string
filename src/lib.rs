@@ -346,24 +346,24 @@ impl std::fmt::Display for Bar {
     /// ```
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let percent = self.calculate_percent();
-        let mut progress_bar = String::from("[");
+        f.write_str("[")?;
         for i in 0..self.width {
             if (i as f32) < ((self.width as f32 * percent) - 1.0) {
-                progress_bar.push(self.full_char);
+                f.write_fmt(format_args!("{}", self.full_char))?;
             } else if (i as f32) < (self.width as f32 * percent) {
-                progress_bar.push(self.leading_char)
+                f.write_fmt(format_args!("{}", self.leading_char))?;
             } else {
-                progress_bar.push(self.empty_char);
+                f.write_fmt(format_args!("{}", self.empty_char))?;
             }
         }
-        progress_bar.push(']');
+        f.write_str("]")?;
         if self.include_percent {
-            progress_bar.push_str(format!(" {:.2}%", percent * 100.0).as_str());
+            f.write_fmt(format_args!(" {:.2}%", percent * 100.0))?;
         }
         if self.include_numbers {
-            progress_bar.push_str(format!(" {:?}/{:?}", self.current_partial, self.total).as_str());
+            f.write_fmt(format_args!(" {:?}/{:?}", self.current_partial, self.total))?;
         }
-        write!(f, "{}", progress_bar)
+        Ok(())
     }
 }
 
