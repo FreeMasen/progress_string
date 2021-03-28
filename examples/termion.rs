@@ -8,7 +8,7 @@ fn main() {
     let mut bar = progress_string::BarBuilder::new()
         .total(TOTAL)
         .include_percent()
-        .get_bar();
+        .build();
 
     println!("starting the progress");
     for i in 0..TOTAL {
