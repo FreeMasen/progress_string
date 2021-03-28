@@ -1,6 +1,6 @@
 [package]
 name = "progress_string"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["FreeMasen"]
 description = "Generate a progress bar string"
 repository = "https://github.com/freemasen/progress_string"
