@@ -30,7 +30,7 @@
 //! }
 //!
 //! # #[cfg(not(unix))]
-//! fn main() {}
+//! # fn main() {}
 //!```
 
 /// Represents a progress bar which can be used to get your progress string.
@@ -40,6 +40,7 @@ pub struct Bar {
     width: usize,
     empty_char: char,
     full_char: char,
+    leading_char: char,
     include_percent: bool,
     include_numbers: bool,
     previous_text_width: usize,
@@ -131,6 +132,32 @@ impl BarBuilder {
         self.bar.full_char = character;
         self
     }
+    /// Update the character you want to use to lead the full section of the bar
+    /// (defaults to the value of `full_char` if not provided).
+    ///
+    /// #### Examples
+    /// ```
+    /// use progress_string::BarBuilder;
+    ///
+    /// let x_bar = BarBuilder::new()
+    ///                 .full_char('X')
+    ///                 .leading_char('}')
+    ///                 .get_bar();
+    /// // yields [XXXXXX}     ]
+    /// let y_bar = BarBuilder::new()
+    ///                 .full_char('Y')
+    ///                 .leading_char(')')
+    ///                 .get_bar();
+    /// // yields [YYYYYY)     ]
+    /// ```
+    pub fn leading_char(mut self, character: impl Into<Option<char>>) -> BarBuilder {
+        if let Some(char) = character.into() {
+            self.bar.leading_char = char;
+        } else {
+            self.bar.leading_char = self.bar.full_char;
+        }
+        self
+    }
 
     /// Update the bar to include the percent after the bar representation (default `false`).
     ///
@@ -187,6 +214,7 @@ impl Default for Bar {
     ///     width: 50,
     ///     full_char:  '█',
     ///     empty_char: ' ',
+    ///     leading_char: '█',
     ///     include_percent: false,
     ///     include_numbers: false,
     ///     previous_text_width: 0
@@ -199,6 +227,7 @@ impl Default for Bar {
             width: 50,
             full_char: '█',
             empty_char: ' ',
+            leading_char: '█',
             include_percent: false,
             include_numbers: false,
             previous_text_width: 0,
@@ -235,7 +264,6 @@ impl Bar {
         self.previous_text_width = self.get_width();
         self.current_partial = new_progress;
     }
-
     /// Get the current width of characters in the bar.
     ///
     /// This includes the brackets, spaces and percent if set.
@@ -310,8 +338,10 @@ impl std::fmt::Display for Bar {
         let percent = self.calculate_percent();
         let mut progress_bar = String::from("[");
         for i in 0..self.width {
-            if (i as f32) < (self.width as f32 * percent) {
+            if (i as f32) < ((self.width as f32 * percent) - 1.0) {
                 progress_bar.push(self.full_char);
+            } else if (i as f32) < (self.width as f32 * percent) {
+                progress_bar.push(self.leading_char)
             } else {
                 progress_bar.push(self.empty_char);
             }
@@ -373,6 +403,35 @@ mod tests {
         bar.update(50);
         assert_eq!(
             bar.to_string(),
+            "[█████████████████████████                         ]"
+        )
+    }
+    #[test]
+    fn leading_char() {
+        let mut bar = BarBuilder::new()
+            .leading_char('>')
+            .get_bar();
+        assert_eq!(
+            bar.to_string(),
+            "[                                                  ]"
+        );
+        bar.update(50);
+        assert_eq!(
+            bar.to_string(),
+            "[████████████████████████>                         ]"
+        )
+    }
+    #[test]
+    fn display() {
+        let mut bar = BarBuilder::new()
+            .get_bar();
+        assert_eq!(
+            format!("{}", bar),
+            "[                                                  ]"
+        );
+        bar.update(50);
+        assert_eq!(
+            format!("{}", bar),
             "[█████████████████████████                         ]"
         )
     }
