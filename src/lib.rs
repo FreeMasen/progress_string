@@ -374,33 +374,79 @@ mod tests {
     #[test]
     fn include_percent_test() {
         let mut bar = BarBuilder::new().include_percent().build();
+        // single digit percent
         assert_eq!(bar.get_width(), 58);
+        assert_eq!(
+            format!("{}", bar),
+            "[                                                  ] 0.00%"
+        );
         bar.update(50);
+        // double digit percent
         assert_eq!(bar.get_width(), 59);
+        assert_eq!(
+            format!("{}", bar),
+            "[█████████████████████████                         ] 50.00%"
+        );
         bar.update(50);
+        // triple digit percent
         assert_eq!(bar.get_width(), 60);
+        assert_eq!(
+            format!("{}", bar),
+            "[██████████████████████████████████████████████████] 100.00%"
+        );
     }
 
     #[test]
     fn include_numbers_test() {
         let mut bar = BarBuilder::new().include_numbers().build();
+        // 0/100
         assert_eq!(bar.get_width(), 58);
+        assert_eq!(
+            format!("{}", bar),
+            "[                                                  ] 0/100"
+        );
         bar.update(50);
+        // 50/100
         assert_eq!(bar.get_width(), 59);
+        assert_eq!(
+            format!("{}", bar),
+            "[█████████████████████████                         ] 50/100"
+        );
         bar.update(50);
+        // 100/100
         assert_eq!(bar.get_width(), 60);
+        assert_eq!(
+            format!("{}", bar),
+            "[██████████████████████████████████████████████████] 100/100"
+        );
     }
 
     #[test]
     fn update_test() {
         let mut bar = Bar::default();
         bar.update(50);
+        assert_eq!(bar.current_partial, 50);
+        assert_eq!(
+            format!("{}", bar),
+            "[█████████████████████████                         ]"
+        );
     }
 
     #[test]
     fn replace_test() {
         let mut bar = Bar::default();
+        bar.update(50);
+        assert_eq!(bar.current_partial, 50);
+        assert_eq!(
+            format!("{}", bar),
+            "[█████████████████████████                         ]"
+        );
         bar.replace(10);
+        assert_eq!(bar.current_partial, 10);
+        assert_eq!(
+            format!("{}", bar),
+            "[█████                                             ]"
+        );
     }
 
     #[test]
@@ -418,9 +464,7 @@ mod tests {
     }
     #[test]
     fn leading_char() {
-        let mut bar = BarBuilder::new()
-            .leading_char('>')
-            .build();
+        let mut bar = BarBuilder::new().leading_char('>').build();
         assert_eq!(
             bar.to_string(),
             "[                                                  ]"
@@ -433,8 +477,7 @@ mod tests {
     }
     #[test]
     fn display() {
-        let mut bar = BarBuilder::new()
-            .build();
+        let mut bar = BarBuilder::new().build();
         assert_eq!(
             format!("{}", bar),
             "[                                                  ]"
