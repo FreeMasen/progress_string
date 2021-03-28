@@ -8,6 +8,10 @@
 //! use std::time::Duration;
 //!
 //! const TOTAL: usize = 1000;
+//! let mut bar = progress_string::BarBuilder::new()
+//!     .total(TOTAL)
+//!     .include_percent()
+//!     .build();
 //!
 //! # #[cfg(unix)]
 //! fn main() {
@@ -58,7 +62,7 @@ pub struct Bar {
 ///                     .empty_char('0')
 ///                     .full_char('X')
 ///                     .include_percent()
-///                     .get_bar();
+///                     .build();
 /// ```
 /// the above would look something like this
 /// `[XXXXXXXXXX0000000000] 50.00%`
@@ -85,7 +89,7 @@ impl BarBuilder {
     /// ```
     /// use progress_string::BarBuilder;
     ///
-    /// let thousand = BarBuilder::new().total(1000).get_bar();
+    /// let thousand = BarBuilder::new().total(1000).build();
     /// // yields [█                                                 ]
     /// ```
     pub fn total(mut self, total: usize) -> BarBuilder {
@@ -109,7 +113,7 @@ impl BarBuilder {
     /// ```
     /// use progress_string::BarBuilder;
     ///
-    /// let zero_emp = BarBuilder::new().empty_char('0').get_bar();
+    /// let zero_emp = BarBuilder::new().empty_char('0').build();
     /// // yields
     /// // [██████████00000000000]
     /// ```
@@ -123,9 +127,9 @@ impl BarBuilder {
     /// ```
     /// use progress_string::BarBuilder;
     ///
-    /// let x_bar = BarBuilder::new().full_char('X').get_bar();
+    /// let x_bar = BarBuilder::new().full_char('X').build();
     /// // yields [XXXXXX      ]
-    /// let y_bar = BarBuilder::new().full_char('Y').get_bar();
+    /// let y_bar = BarBuilder::new().full_char('Y').build();
     /// // yields [YYYYYY      ]
     /// ```
     pub fn full_char(mut self, character: char) -> BarBuilder {
@@ -142,12 +146,12 @@ impl BarBuilder {
     /// let x_bar = BarBuilder::new()
     ///                 .full_char('X')
     ///                 .leading_char('}')
-    ///                 .get_bar();
+    ///                 .build();
     /// // yields [XXXXXX}     ]
     /// let y_bar = BarBuilder::new()
     ///                 .full_char('Y')
     ///                 .leading_char(')')
-    ///                 .get_bar();
+    ///                 .build();
     /// // yields [YYYYYY)     ]
     /// ```
     pub fn leading_char(mut self, character: impl Into<Option<char>>) -> BarBuilder {
@@ -165,7 +169,7 @@ impl BarBuilder {
     /// ```
     /// use progress_string::BarBuilder;
     ///
-    /// let no_p = BarBuilder::new().include_percent().get_bar();
+    /// let no_p = BarBuilder::new().include_percent().build();
     /// // yields [██████████          ] 50.00%
     /// let with_p = BarBuilder::new();
     /// // yields [██████████          ]
@@ -180,10 +184,10 @@ impl BarBuilder {
     /// ```
     /// use progress_string::BarBuilder;
     ///
-    /// let mut no_n = BarBuilder::new().get_bar();
+    /// let mut no_n = BarBuilder::new().build();
     /// no_n.replace(50);
     /// // yields [██████████          ]
-    /// let mut with_n = BarBuilder::new().include_numbers().get_bar();
+    /// let mut with_n = BarBuilder::new().include_numbers().build();
     /// with_n.replace(50)
     /// // yields [██████████          ] 50/100
     /// ```
@@ -191,16 +195,22 @@ impl BarBuilder {
         self.bar.include_numbers = true;
         self
     }
+    /// deprecated please use `build`
+    #[deprecated]
+    pub fn get_bar(self) -> Bar {
+        self.bar
+    }
+
     /// Complete building your bar and return the updated struct.
     ///
     /// #### Examples
     /// ```
     /// use progress_string::BarBuilder;
     ///
-    /// let bar = BarBuilder::new().get_bar();
+    /// let bar = BarBuilder::new().build();
     /// // yields a default bar instance
     /// ```
-    pub fn get_bar(self) -> Bar {
+    pub fn build(self) -> Bar {
         self.bar
     }
 }
@@ -275,7 +285,7 @@ impl Bar {
     /// let bar = Bar::default();
     /// assert_eq!(bar.get_width(), 52);
     ///
-    /// let mut with_percent = BarBuilder::new().include_percent().get_bar();
+    /// let mut with_percent = BarBuilder::new().include_percent().build();
     /// assert_eq!(with_percent.get_width(), 58);
     ///
     /// with_percent.update(10);
@@ -326,11 +336,11 @@ impl std::fmt::Display for Bar {
     /// ```
     /// use progress_string::BarBuilder;
     ///
-    /// let mut with_percent = BarBuilder::new().include_percent().get_bar();
+    /// let mut with_percent = BarBuilder::new().include_percent().build();
     /// with_percent.update(50);
     /// println!("{}", with_percent.to_string());
     /// // prints [█████████████████████████                         ] 50.00%
-    /// let mut no_percent = BarBuilder::new().get_bar();
+    /// let mut no_percent = BarBuilder::new().build();
     /// no_percent.update(50);
     /// // prints [█████████████████████████                         ]
     /// ```
@@ -363,7 +373,7 @@ mod tests {
 
     #[test]
     fn include_percent_test() {
-        let mut bar = BarBuilder::new().include_percent().get_bar();
+        let mut bar = BarBuilder::new().include_percent().build();
         assert_eq!(bar.get_width(), 58);
         bar.update(50);
         assert_eq!(bar.get_width(), 59);
@@ -373,7 +383,7 @@ mod tests {
 
     #[test]
     fn include_numbers_test() {
-        let mut bar = BarBuilder::new().include_numbers().get_bar();
+        let mut bar = BarBuilder::new().include_numbers().build();
         assert_eq!(bar.get_width(), 58);
         bar.update(50);
         assert_eq!(bar.get_width(), 59);
@@ -410,7 +420,7 @@ mod tests {
     fn leading_char() {
         let mut bar = BarBuilder::new()
             .leading_char('>')
-            .get_bar();
+            .build();
         assert_eq!(
             bar.to_string(),
             "[                                                  ]"
@@ -424,7 +434,7 @@ mod tests {
     #[test]
     fn display() {
         let mut bar = BarBuilder::new()
-            .get_bar();
+            .build();
         assert_eq!(
             format!("{}", bar),
             "[                                                  ]"
