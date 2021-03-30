@@ -1,9 +1,10 @@
-#![cfg(unix)]
+#[cfg(unix)]
 use std::thread::sleep;
+#[cfg(unix)]
 use std::time::Duration;
-
+#[cfg(unix)]
 const TOTAL: usize = 1000;
-
+#[cfg(unix)]
 fn main() {
     let mut bar = progress_string::BarBuilder::new()
         .total(TOTAL)
@@ -21,4 +22,9 @@ fn main() {
         sleep(Duration::from_millis(10));
     }
     println!("\ndone with progress");
+}
+
+#[cfg(not(unix))]
+fn main() {
+    println!("termion is only compatible with unix like operating systems");
 }
