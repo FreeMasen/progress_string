@@ -4,21 +4,19 @@
 //! #### Example
 //!
 //! ```
+//! # #[cfg(unix)]
 //! use std::thread::sleep;
+//! # #[cfg(unix)]
 //! use std::time::Duration;
 //!
+//! # #[cfg(unix)]
 //! const TOTAL: usize = 1000;
-//! let mut bar = progress_string::BarBuilder::new()
-//!     .total(TOTAL)
-//!     .include_percent()
-//!     .build();
-//!
 //! # #[cfg(unix)]
 //! fn main() {
 //!     let mut bar = progress_string::BarBuilder::new()
 //!         .total(TOTAL)
 //!         .include_percent()
-//!         .get_bar();
+//!         .build();
 //!
 //!     println!("starting the progress");
 //!     for i in 0..TOTAL {

@@ -1,9 +1,9 @@
+#![cfg(unix)]
 use std::thread::sleep;
 use std::time::Duration;
 
 const TOTAL: usize = 1000;
 
-#[cfg(unix)]
 fn main() {
     let mut bar = progress_string::BarBuilder::new()
         .total(TOTAL)
@@ -22,6 +22,3 @@ fn main() {
     }
     println!("\ndone with progress");
 }
-
-#[cfg(not(unix))]
-fn main() {}
